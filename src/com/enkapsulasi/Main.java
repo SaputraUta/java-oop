@@ -4,11 +4,13 @@ class Player {
     private String name;
     private int baseHealth;
     private int baseAttack;
-    private Weapon weapon;
-    private Armor armor;
     private int level;
     private int incrementHealth;
     private int incrementAttack;
+    private int totalDamage;
+    private Boolean isAlive;
+    private Weapon weapon;
+    private Armor armor;
 
     Player(String name) {
         this.name = name;
@@ -17,14 +19,55 @@ class Player {
         this.level = 1;
         this.incrementHealth = 20;
         this.incrementAttack = 20;
+        this.isAlive = true;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getHealth() {
+        return this.maxHealth() - this.totalDamage;
     }
 
     public void display() {
-        System.out.println("\nPlayer name: " + this.name);
-        System.out.println("Player level: " + this.level);
-        System.out.println("Player attack: " + this.getAttack());
-        System.out.println("Player max health: " + this.maxHealth());
+        System.out.println("\nPlayer name\t\t: " + this.name);
+        System.out.println("Player level\t\t: " + this.level);
+        System.out.println("Player attack\t\t: " + this.getAttackPower());
+        System.out.println("Player health\t\t: " + this.getHealth() + " / " + this.maxHealth());
+        System.out.println("Status player\t\t: " + (this.isAlive ? "alive" : "dead"));
+    }
 
+    public void attack(Player opponent) {
+        int damage = this.getAttackPower();
+
+        System.out.println("\n" + this.name + " attacking " + opponent.getName() + " with damage " + damage);
+        opponent.defence(damage);
+        this.levelUp();
+    }
+
+    private int getAttackPower() {
+        return this.baseAttack + this.level * this.incrementAttack + this.weapon.getAttack();
+    }
+
+    private void defence(int damage) {
+        int deltaDamage;
+        int defensePower = this.armor.getDefensePower();
+
+        if (damage < defensePower) {
+            deltaDamage = 0;
+        } else {
+            deltaDamage = damage - defensePower;
+        }
+
+        this.totalDamage += deltaDamage;
+
+        if (this.getHealth() <= 0) {
+            this.isAlive = false;
+            this.totalDamage = this.maxHealth();
+        }
+
+        this.display();
     }
 
     public void setArmor(Armor armor) {
@@ -41,10 +84,6 @@ class Player {
 
     public int maxHealth() {
         return this.baseHealth + this.incrementHealth * this.level + this.armor.getAddHealth();
-    }
-
-    public int getAttack() {
-        return this.baseAttack + this.level * this.incrementAttack + this.weapon.getAttack();
     }
 }
 
@@ -76,6 +115,10 @@ class Armor {
     public int getAddHealth() {
         return this.strength * 10 + this.health;
     }
+
+    public int getDefensePower() {
+        return this.strength * 2;
+    }
 }
 
 public class Main {
@@ -94,10 +137,14 @@ public class Main {
         player1.display();
         player2.display();
 
-        player1.levelUp();
-        player2.levelUp();
-        player1.display();
-        player2.display();
-        
+        player1.attack(player2);
+
+        // player1.levelUp();
+        // player2.levelUp();
+
+        player2.attack(player1);
+
+        player1.attack(player2);
+
     }
 }
