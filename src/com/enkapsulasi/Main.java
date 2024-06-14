@@ -22,11 +22,11 @@ class Player {
         this.isAlive = true;
     }
 
-    public String getName() {
+    private String getName() {
         return name;
     }
 
-    public int getHealth() {
+    private int getHealth() {
         return this.maxHealth() - this.totalDamage;
     }
 
@@ -78,11 +78,11 @@ class Player {
         this.weapon = weapon;
     }
 
-    public void levelUp() {
+    private void levelUp() {
         this.level++;
     }
 
-    public int maxHealth() {
+    private int maxHealth() {
         return this.baseHealth + this.incrementHealth * this.level + this.armor.getAddHealth();
     }
 }
